@@ -36,7 +36,7 @@ total_mem = len(sum_pvt)
 
 server = flask.Flask(__name__)
 server.secret_key = os.environ.get('secret_key', str(randint(0, 1000000)))
-app = dash.Dash('groupme-analytic', server=server)
+app = dash.Dash(__name__, server=server)
 
 app.layout = html.Div(children = [
     html.H1(children = 'GroupMe Analytics'),
