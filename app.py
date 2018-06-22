@@ -8,6 +8,7 @@ from datetime import datetime
 import dataprep as dp
 
 
+
 access_token = 'WgdkiHLjL5Qe0AgGUhqAnXExQuPQIdvah67xTDQr'
 group_id = '13388728'
 gen_date = str(datetime.now())
@@ -26,13 +27,13 @@ pvt.sort_values(by = ('count', 'favorited_count'),ascending=True,inplace=True)
 count_pvt = pvt.loc[:,('count', 'favorited_count')].sort_values(ascending=True)
 sum_pvt = pvt1.loc[:,('count', 'favorited_count')].sort_values(ascending=True)
 
-print(pvt)
 
 total_msg = len(final_df)
 total_mem = len(sum_pvt)
 
 
-app = dash.Dash()
+app = dash.Dash('groupme-analytic')
+server = app.server
 
 app.layout = html.Div(children = [
     html.H1(children = 'GroupMe Analytics'),
