@@ -2,6 +2,7 @@ import dash
 import dash_core_components as dcc
 import dash_html_components as html
 import plotly.graph_objs as go
+import flask
 
 import pandas as pd
 from datetime import datetime
@@ -32,8 +33,10 @@ total_msg = len(final_df)
 total_mem = len(sum_pvt)
 
 
-app = dash.Dash('groupme-analytic')
-server = app.server
+
+server = flask.Flask(__name__)
+server.secret_key = os.environ.get('secret_key', str(randint(0, 1000000)))
+app = dash.Dash('groupme-analytic', server=server)
 
 app.layout = html.Div(children = [
     html.H1(children = 'GroupMe Analytics'),
@@ -160,4 +163,4 @@ def update_pie_probablity(name):
 
 if __name__ == '__main__':
     #app.run_server(debug=True, port=8000, host='0.0.0.0')
-    app.run_server(debug=True)
+    app.run_server(debug=True, threaded=True)
