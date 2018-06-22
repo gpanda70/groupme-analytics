@@ -118,5 +118,4 @@ Werkzeug==0.14.1
 widgetsnbextension==3.2.1
 win-inet-pton==1.0.1
 wincertstore==0.2
-xgboost==0.72
 xlrd==1.1.0
