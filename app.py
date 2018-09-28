@@ -11,7 +11,7 @@ from datetime import datetime
 import dataprep as dp
 
 
-
+test = ''
 access_token = 'WgdkiHLjL5Qe0AgGUhqAnXExQuPQIdvah67xTDQr'
 group_id = '13388728'
 gen_date = str(datetime.now())
