@@ -83,7 +83,12 @@ def save_load_transform(access_token,group_id):
     last_msg = pd.read_csv('src', sep='\t', encoding='utf-8')['message_id'].iat[0]
     new_df = data_pull(last_msg,access_token,group_id)
     t_df = transform_data(new_df)
-    return t_df
+    final_df = pd.concat([t_df, pd.read_csv('src', sep='\t', encoding='utf-8')], ignore_index=True)
+    final_df = final_df.loc[(final_df.real_names != 'GroupMe') & (final_df.real_names != 'GroupMe Calendar') & (final_df.real_names != 'Paul Joon Kim'), :]
+    final_df.to_csv('src', sep='\t', encoding='utf-8', index=False)
+    final_df['favorited_count'] = final_df['favorited_count'].astype(np.float64)
+
+    return final_df
 
 def get_proportions(final_df):
     proportions = {}
