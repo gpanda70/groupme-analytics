@@ -114,12 +114,3 @@ class TransformSolver:
 
     def changeTransformation(self, newTransform):
         self.strategy = newTransform
-
-
-access_token = 'WgdkiHLjL5Qe0AgGUhqAnXExQuPQIdvah67xTDQr'
-group_id = '13388728'
-msg = Message(access_token, group_id,r'C:\Users\gpand_000\Documents\Deployment\src')
-
-final_df = msg.load()
-ylb = TotalMessages()
-print(ylb.run(final_df))
