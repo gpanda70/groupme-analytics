@@ -20,7 +20,8 @@ group_id = '13388728'
 sched = BlockingScheduler()
 
 # Loading in the message and updating it
-msg = Message(access_token, group_id,'src')
+file_path = os.path.join(os.path.dirname(__file__),'src')
+msg = Message(access_token, group_id,file_path)
 
 @sched.scheduled_job('cron', day_of_week='mon-fri', hour=1)
 def scheduled_job():
