@@ -101,4 +101,4 @@ class Message:
             final_df = final_df.loc[(final_df.real_names != 'GroupMe') & (final_df.real_names != 'GroupMe Calendar') & (final_df.real_names != 'Paul Joon Kim'), :]
             #converts favorited count to float so you can perform divisions
             final_df['favorited_count'] = final_df['favorited_count'].astype(np.float64)
-            final_df.to_csv('src', sep='\t', encoding='utf-8', index=False)
+            final_df.to_csv(self.file_name, sep='\t', encoding='utf-8', index=False)
