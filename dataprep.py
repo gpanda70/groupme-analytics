@@ -3,11 +3,11 @@ import pandas as pd
 import numpy as np
 
 user_map = {'10509565': 'Paul Joon Kim', '10956238': 'Cody Walls', '12719684': 'Christian Cremo',
-            '13130965': 'Stephen Osborn', '16034819': 'George Barron', '16923137': 'Scott Tippins',
+            '13130965': 'Stephen Osborn', '16034819': 'George Barron', '16923137': 'Scott Tippins','303329': 'Jenkins',
             '21051438': 'Andrew Wardlaw', '22705519': 'James Im', '22705520': 'Steven Hancock',
             '24129141': 'Friedrich Neat', '6667755': 'Jack Harris', 'calendar': 'GroupMe Calendar',
             'system': 'GroupMe', 10509565: 'Paul Joon Kim', 10956238: 'Cody Walls', 12719684: 'Christian Cremo',
-            13130965: 'Stephen Osborn', 16034819: 'George Barron', 16923137: 'Scott Tippins',
+            13130965: 'Stephen Osborn', 16034819: 'George Barron', 16923137: 'Scott Tippins', 303329: 'Jenkins',
             21051438: 'Andrew Wardlaw', 22705519: 'James Im', 22705520: 'Steven Hancock',
             24129141: 'Friedrich Neat', 6667755: 'Jack Harris'}
 
@@ -83,7 +83,12 @@ def save_load_transform(access_token,group_id):
     last_msg = pd.read_csv('src', sep='\t', encoding='utf-8')['message_id'].iat[0]
     new_df = data_pull(last_msg,access_token,group_id)
     t_df = transform_data(new_df)
-    return t_df
+    final_df = pd.concat([t_df, pd.read_csv('src', sep='\t', encoding='utf-8')], ignore_index=True)
+    final_df = final_df.loc[(final_df.real_names != 'GroupMe') & (final_df.real_names != 'GroupMe Calendar') & (final_df.real_names != 'Paul Joon Kim'), :]
+    final_df.to_csv('src', sep='\t', encoding='utf-8', index=False)
+    final_df['favorited_count'] = final_df['favorited_count'].astype(np.float64)
+
+    return final_df
 
 def get_proportions(final_df):
     proportions = {}
