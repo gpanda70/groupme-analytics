@@ -6,31 +6,48 @@ import flask
 import os
 from random import randint
 
+from apscheduler.schedulers.blocking import BlockingScheduler
 import pandas as pd
 from datetime import datetime
-import dataprep as dp
 
+from message import Message
+import transform
 
 access_token = 'WgdkiHLjL5Qe0AgGUhqAnXExQuPQIdvah67xTDQr'
 group_id = '13388728'
-gen_date = str(datetime.now())
 
-final_df = dp.save_load_transform(access_token, group_id)
-print(final_df.head())
+sched = BlockingScheduler()
 
-proportions = dp.get_proportions(final_df)
+# Loading in the message and updating it
+msg = Message(access_token, group_id,'src')
 
-pvt =  final_df.pivot_table(values = 'favorited_count', index='real_names',aggfunc=['sum', 'count', 'mean'])
-pvt1 = final_df[(final_df['favorited_count']>0) | (final_df['real_names']=='Paul Joon Kim')].pivot_table(values = 'favorited_count', index='real_names',aggfunc=['sum', 'count', 'mean'])
-pvt['difference'] = pvt.loc[:,('count','favorited_count')] - pvt1.loc[:,('sum','favorited_count')]
-pvt.sort_values(by = ('count', 'favorited_count'),ascending=True,inplace=True)
+@sched.scheduled_job('cron', day_of_week='mon-fri', hour=1)
+def scheduled_job():
+    msg.load()
+    msg.update()
+    msg.save()
 
-count_pvt = pvt.loc[:,('count', 'favorited_count')].sort_values(ascending=True)
-sum_pvt = pvt1.loc[:,('count', 'favorited_count')].sort_values(ascending=True)
+final_df = msg.load()
 
+#Data for the first donut chart
+liked_you_prob = transform.TransformSolver(transform.LikedYouProb())
+liked_you_prob = liked_you_prob.transform(final_df)
+
+#Data for the second donut chart
+you_liked_prob = transform.TransformSolver(transform.YouLikedProb())
+you_liked_prob = you_liked_prob.transform(final_df)
+
+#Data for the bar charts
+total_message = transform.TransformSolver(transform.TotalMessages())
+all_like, diff, one_like = total_message.transform(final_df)
+
+all_like = all_like.sort_values('a')
+diff = diff.reindex(all_like.index)
+one_like = one_like.reindex(all_like.index)
 
 total_msg = len(final_df)
-total_mem = len(sum_pvt)
+total_mem = len(diff)
+gen_date = str(datetime.now())
 
 
 #server = flask.Flask(__name__)
@@ -60,15 +77,15 @@ app.layout = html.Div(children = [
             figure={
                 'data': [
                     go.Bar(
-                        x=pvt['difference'],
-                        y=pvt.index,
+                        x=diff['a'],
+                        y=diff.index,
                         orientation='h',
                         name='No Likes'
                     ),
 
                     go.Bar(
-                        x=sum_pvt,
-                        y=sum_pvt.index,
+                        x=one_like['a'],
+                        y=one_like.index,
                         orientation='h',
                         name='At least 1 Like'
                     )
@@ -95,7 +112,7 @@ app.layout = html.Div(children = [
         html.Div([
             dcc.Dropdown(
             id='opt-dropdown',
-            options=[{'label': key, 'value': key} for key, i in proportions.items()],
+            options=[{'label': key, 'value': key} for key, i in liked_you_prob.items()],
             value='Andrew Wardlaw'
             ),
         ], className = 'six columns'),
@@ -103,7 +120,7 @@ app.layout = html.Div(children = [
         html.Div([
             dcc.Dropdown(
             id='opt-dropdown2',
-            options=[{'label': key, 'value': key} for key, i in proportions.items()],
+            options=[{'label': key, 'value': key} for key, i in you_liked_prob.items()],
             value='Andrew Wardlaw'
             ),
         ], className = 'six columns'),
@@ -116,10 +133,10 @@ app.layout = html.Div(children = [
                 figure={
                     "data": [
                         {
-                          "values": proportions['Andrew Wardlaw']*100,
-                          "labels": proportions['Andrew Wardlaw'].index,
-                          "name": "This is the % of Likes attributed to this person",
-                          "hoverinfo":"label+percent+name",
+                          "values": liked_you_prob['Andrew Wardlaw'],
+                          "labels": liked_you_prob['Andrew Wardlaw'].index,
+                          "name": "This is the # of likes this person gave you out of your Total likes received",
+                          "hoverinfo":"label+value+percent+name",
                           "hole": .4,
                           "type": "pie"
                         }
@@ -148,16 +165,16 @@ app.layout = html.Div(children = [
                 figure={
                     "data": [
                         {
-                          "values": proportions['Andrew Wardlaw']*100,
-                          "labels": proportions['Andrew Wardlaw'].index,
-                          "name": "This is the % of Likes attributed to this person",
-                          "hoverinfo":"label+percent+name",
+                          "values": you_liked_prob['Andrew Wardlaw'],
+                          "labels": you_liked_prob['Andrew Wardlaw'].index,
+                          "name": "This is the # of likes you gave this person out of your Total Likes Gave",
+                          "hoverinfo":"label+value+percent+name",
                           "hole": .4,
                           "type": "pie"
                         }
                     ],
                     "layout": {
-                        "title": "Who Likes You?",
+                        "title": "Who do you Like?",
                         "annotations": [
                             {
                                 "font": {
@@ -183,21 +200,54 @@ app.layout = html.Div(children = [
     dash.dependencies.Output('donut-chart', 'figure'),
     [dash.dependencies.Input('opt-dropdown', 'value')]
 )
-def update_pie_probablity(name):
+def update_pie1_probablity(name):
     return {
                 "data": [
                     {
-                      "values": proportions[name]*100,
-                      "labels": proportions[name].index,
+                      "values": liked_you_prob[name],
+                      "labels": liked_you_prob[name].index,
                       "domain": {"x": [0, .48]},
-                      "name": "This is the % of Likes attributed to this person",
-                      "hoverinfo":"label+percent+name",
+                      "name": "This is the # of likes this person gave you out of your Total likes received",
+                      "hoverinfo":"label+value+percent+name",
                       "hole": .4,
                       "type": "pie"
                     }
                 ],
                 "layout": {
-                    "title": "Who Likes You",
+                    "title": "Who Likes You?",
+                    "annotations": [
+                        {
+                            "font": {
+                                "size": 10
+                            },
+                            "showarrow": False,
+                            "text": '<b>'+name.split(' ')[0]+'</b>',
+                            "x": 0.20,
+                            "y": 0.5
+                        }
+                    ]
+                }
+            }
+
+@app.callback(
+    dash.dependencies.Output('donut-chart2', 'figure'),
+    [dash.dependencies.Input('opt-dropdown2', 'value')]
+)
+def update_pie2_probablity(name):
+    return {
+                "data": [
+                    {
+                      "values": you_liked_prob[name],
+                      "labels": you_liked_prob[name].index,
+                      "domain": {"x": [0, .48]},
+                      "name": "This is the # of likes you gave this person out of your Total Likes Gave",
+                      "hoverinfo":"label+value+percent+name",
+                      "hole": .4,
+                      "type": "pie"
+                    }
+                ],
+                "layout": {
+                    "title": "Who do you like?",
                     "annotations": [
                         {
                             "font": {

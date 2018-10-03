@@ -3,11 +3,11 @@ import pandas as pd
 import numpy as np
 
 user_map = {'10509565': 'Paul Joon Kim', '10956238': 'Cody Walls', '12719684': 'Christian Cremo',
-            '13130965': 'Stephen Osborn', '16034819': 'George Barron', '16923137': 'Scott Tippins',
+            '13130965': 'Stephen Osborn', '16034819': 'George Barron', '16923137': 'Scott Tippins','303329': 'Jenkins',
             '21051438': 'Andrew Wardlaw', '22705519': 'James Im', '22705520': 'Steven Hancock',
             '24129141': 'Friedrich Neat', '6667755': 'Jack Harris', 'calendar': 'GroupMe Calendar',
             'system': 'GroupMe', 10509565: 'Paul Joon Kim', 10956238: 'Cody Walls', 12719684: 'Christian Cremo',
-            13130965: 'Stephen Osborn', 16034819: 'George Barron', 16923137: 'Scott Tippins',
+            13130965: 'Stephen Osborn', 16034819: 'George Barron', 16923137: 'Scott Tippins', 303329: 'Jenkins',
             21051438: 'Andrew Wardlaw', 22705519: 'James Im', 22705520: 'Steven Hancock',
             24129141: 'Friedrich Neat', 6667755: 'Jack Harris'}
 
