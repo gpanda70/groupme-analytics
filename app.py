@@ -52,10 +52,10 @@ total_mem = len(diff)
 gen_date = str(datetime.now())
 
 
-#server = flask.Flask(__name__)
-#server.secret_key = os.environ.get('secret_key', str(randint(0, 1000000)))
-#app = dash.Dash(__name__, server=server)
-app = dash.Dash()
+server = flask.Flask(__name__)
+server.secret_key = os.environ.get('secret_key', str(randint(0, 1000000)))
+app = dash.Dash(__name__, server=server)
+#app = dash.Dash()
 
 #app.css.append_css({'external_url': 'https://codepen.io/amyoshino/pen/jzXypZ.css'})
 app.css.append_css({'external_url': ['https://cdn.rawgit.com/xhlulu/0acba79000a3fd1e6f552ed82edb8a64/raw/dash_template.css',
@@ -269,6 +269,6 @@ def update_pie2_probablity(name):
 
 if __name__ == '__main__':
     #app.run_server(debug=True, port=8000, host='0.0.0.0')
-    #app.run_server(debug=True, threaded=True)
-    app.run_server(debug=True, port=8000, host='0.0.0.0')
+    app.run_server(debug=True, threaded=True)
+    #app.run_server(debug=True, port=8000, host='0.0.0.0')
     #app.run_server(debug=True, threaded=True)
