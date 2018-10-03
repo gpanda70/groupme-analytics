@@ -10,13 +10,10 @@ from apscheduler.schedulers.blocking import BlockingScheduler
 import pandas as pd
 from datetime import datetime
 
-<<<<<<< HEAD
-test = ''
-=======
+
 from message import Message
 import transform
 
->>>>>>> refactor
 access_token = 'WgdkiHLjL5Qe0AgGUhqAnXExQuPQIdvah67xTDQr'
 group_id = '13388728'
 
@@ -270,10 +267,7 @@ def update_pie2_probablity(name):
 
 
 if __name__ == '__main__':
-<<<<<<< HEAD
     #app.run_server(debug=True, port=8000, host='0.0.0.0')
-    app.run_server(debug=True, threaded=True)
-=======
+    #app.run_server(debug=True, threaded=True)
     app.run_server(debug=True, port=8000, host='0.0.0.0')
     #app.run_server(debug=True, threaded=True)
->>>>>>> refactor
