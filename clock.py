@@ -3,8 +3,8 @@ from apscheduler.schedulers.blocking import BlockingScheduler
 from message import Message
 
 
-access_token = 'WgdkiHLjL5Qe0AgGUhqAnXExQuPQIdvah67xTDQr'
-group_id = '13388728'
+access_token = os.getenv('access_token')
+group_id = os.getenv('group_id')
 
 sched = BlockingScheduler()
 

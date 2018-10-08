@@ -1,10 +1,4 @@
 import pandas as pd
-import json
-import requests
-import numpy as np
-from ast import literal_eval
-
-from message import Message
 
 
 class Transform:
