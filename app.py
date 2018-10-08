@@ -1,41 +1,46 @@
-import dash
-import dash_core_components as dcc
-import dash_html_components as html
-import plotly.graph_objs as go
 import flask
 import os
 from random import randint
 
-from apscheduler.schedulers.blocking import BlockingScheduler
+import dash
+import dash_core_components as dcc
+import dash_html_components as html
+import plotly.graph_objs as go
 import pandas as pd
 from datetime import datetime
-
 
 from message import Message
 import transform
 
-access_token = 'WgdkiHLjL5Qe0AgGUhqAnXExQuPQIdvah67xTDQr'
-group_id = '13388728'
+# Set up tokens and flask
 
-sched = BlockingScheduler()
+access_token = os.getenv('access_token')
+group_id = os.getenv('group_id')
+
+server = flask.Flask(__name__)
+server.secret_key = os.environ.get('secret_key', str(randint(0, 1000000)))
+app = dash.Dash(__name__, server=server)
+# app = dash.Dash()
+
+
+###########################
+# Data Manipulation / Model
+###########################
 
 # Loading in the message and updating it
-file_path = os.path.join(os.path.dirname(__file__),'src')
-msg = Message(access_token, group_id,file_path)
-
-#
-
+file_path = os.path.join(os.path.dirname(__file__), 'src')
+msg = Message(access_token, group_id, file_path)
 final_df = msg.load()
 
-#Data for the first donut chart
+# Data for the first donut chart
 liked_you_prob = transform.TransformSolver(transform.LikedYouProb())
 liked_you_prob = liked_you_prob.transform(final_df)
 
-#Data for the second donut chart
+# Data for the second donut chart
 you_liked_prob = transform.TransformSolver(transform.YouLikedProb())
 you_liked_prob = you_liked_prob.transform(final_df)
 
-#Data for the bar charts
+# Data for the bar charts
 total_message = transform.TransformSolver(transform.TotalMessages())
 all_like, diff, one_like = total_message.transform(final_df)
 
@@ -43,30 +48,30 @@ all_like = all_like.sort_values('a')
 diff = diff.reindex(all_like.index)
 one_like = one_like.reindex(all_like.index)
 
+# This is for user metrics in start of dashboard
 total_msg = len(final_df)
 total_mem = len(diff)
 gen_date = str(datetime.now())
 
 
-server = flask.Flask(__name__)
-server.secret_key = os.environ.get('secret_key', str(randint(0, 1000000)))
-app = dash.Dash(__name__, server=server)
-#app = dash.Dash()
+#########################
+# Dashboard Layout / View
+#########################
 
-#app.css.append_css({'external_url': 'https://codepen.io/amyoshino/pen/jzXypZ.css'})
+# app.css.append_css({'external_url': 'https://codepen.io/amyoshino/pen/jzXypZ.css'})
 app.css.append_css({'external_url': ['https://cdn.rawgit.com/xhlulu/0acba79000a3fd1e6f552ed82edb8a64/raw/dash_template.css',
                                      'https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css',
                                      'https://cdn.rawgit.com/TahiriNadia/styles/b1026938/custum-styles_phyloapp.css',
                                      'https://fonts.googleapis.com/css?family=Raleway:400,400i,700,700i',
                                      'https://fonts.googleapis.com/css?family=Product+Sans:400,400i,700,700i']})
 
-app.layout = html.Div(children = [
+app.layout = html.Div(children=[
     html.Div([
         html.H2('GroupMe Analytics')
     ], className='banner'),
 
 
-    html.Div(children =
+    html.Div(children=
              '%d Members | %d Messages | Analytics generated as of %s' %(total_mem, total_msg, gen_date)),
 
     html.Div([
@@ -193,6 +198,9 @@ app.layout = html.Div(children = [
 ], className= 'ten columns offset-by-one')
 
 
+#############################################
+# Interaction Between Components / Controller
+#############################################
 
 @app.callback(
     dash.dependencies.Output('donut-chart', 'figure'),

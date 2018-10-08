@@ -1,5 +1,4 @@
 import requests
-import json
 from ast import literal_eval
 
 import pandas as pd
@@ -27,7 +26,8 @@ class Message:
         """Loads in csv file that contains all groupme messages"""
         self.df = pd.read_csv(self.file_name, sep='\t', encoding='utf-8')
 
-        #Reads in the string as a list and ignores null values in the favorited_by column
+        # Reads in the string as a list and
+        # ignores null values in the favorited_by column
         self.df.loc[:, 'favorited_by'] = self.df.loc[:, 'favorited_by'].apply(lambda x: x if pd.isnull(x) else literal_eval(x))
         return self.df
 
@@ -53,7 +53,6 @@ class Message:
                     self.favorited_by.append(data['response']['messages'][i]['favorited_by'])
                     self.message_id.append(data['response']['messages'][i]['id'])
 
-
                 payload = {'after_id': self.message_id[-1]}
                 response = requests.get('https://api.groupme.com/v3/groups/' + self.group_id + '/messages?token=' + self.access_token,
                                         params=payload)
@@ -65,7 +64,6 @@ class Message:
             except KeyError:
                 history = False
                 self.is_current = True
-
 
     def save(self):
         if not self.is_current:
@@ -86,19 +84,19 @@ class Message:
                                'favorited_by': self.favorited_by,
                                'message_id': self.message_id})
 
-            #transforms empty list in favorited by to null value
+            # transforms empty list in favorited by to null value
             updated_df['favorited_by'] = updated_df['favorited_by'].apply(lambda x: np.nan if not x else x)
-            #Finds the count of favorited messages and updates the favorited_count column
+            # Finds the count of favorited messages and updates the favorited_count column
             updated_df['favorited_count'] = updated_df['favorited_by'].apply(lambda x: len(x) if isinstance(x,list) \
                                     else 0)
-            #maps names to real names based on user id.
+            # maps names to real names based on user id.
             updated_df['real_names'] = updated_df['user_id'].map(user_map)
-            #reverses direction so it will fit with new data
+            # reverses direction so it will fit with new data
             updated_df = updated_df[::-1]
 
             final_df = pd.concat([updated_df, self.df], ignore_index=True)
-            #ignores the people below
+            # ignores the people below
             final_df = final_df.loc[(final_df.real_names != 'GroupMe') & (final_df.real_names != 'GroupMe Calendar') & (final_df.real_names != 'Paul Joon Kim'), :]
-            #converts favorited count to float so you can perform divisions
+            # converts favorited count to float so you can perform divisions
             final_df['favorited_count'] = final_df['favorited_count'].astype(np.float64)
             final_df.to_csv(self.file_name, sep='\t', encoding='utf-8', index=False)
