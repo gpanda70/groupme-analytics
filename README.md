@@ -6,4 +6,4 @@ This is a Heroku cloud-enabled Dashboard for my groupme.
   - Breakdown of your liked messages
   - Breakdown of messages you have liked
 
-  ![alt text](https://raw.githubusercontent.com/gpanda70/groupme-analytics/master/path/to/img.png)
+  ![alt text](https://raw.githubusercontent.com/gpanda70/groupme-analytics/master/image/img.png)
