@@ -15,8 +15,12 @@ class Transform:
     def transform(self, final_df):
         pass
 
-class LikedYouProb(Transform):
 
+class LikedYouProb(Transform):
+    """
+    Represents the transformation for the breakdown of total likes each GroupMe
+    member received.
+    """
     def __init__(self):
         super(LikedYouProb, self).__init__()
         self.user_map
@@ -33,8 +37,13 @@ class LikedYouProb(Transform):
             proportions[person] = (p.value_counts()) # Normalize should turn the numbers to percentages
 
         return proportions
-class YouLikedProb(Transform):
 
+
+class YouLikedProb(Transform):
+    """
+    Represents the transformation for the breakdown of total likes each GroupMe
+    member gave to one another.
+    """
     def __init__(self):
         super(YouLikedProb, self).__init__()
         self.user_map
@@ -64,7 +73,13 @@ class YouLikedProb(Transform):
 
         return proportions
 
+
 class TotalLikesGiven(Transform):
+    """
+    The transfomation for returning a DataFrame that has the count of member's
+    total likes given.
+    """
+
     def __init__(self):
         super(TotalLikesGiven, self).__init__()
         self.user_map
@@ -77,7 +92,12 @@ class TotalLikesGiven(Transform):
         likes_given = likes_given.value_counts()
         return(likes_given)
 
+
 class TotalLikesReceived(Transform):
+    """
+    The transfomation for returning a DataFrame that has the count of member's
+    total likes received.
+    """
     def __init__(self):
         super(TotalLikesReceived, self).__init__()
         self.user_map
@@ -85,7 +105,11 @@ class TotalLikesReceived(Transform):
     def run(self, final_df):
         pvt = final_df.groupby('real_names')['favorited_count'].sum()
         return(pvt)
+
+
 class TotalMessages(Transform):
+    """Returns transformation for Total Messages sent on the groupme"""
+
     def __init__(self):
         super(TotalMessages, self).__init__()
         self.user_map
@@ -96,10 +120,11 @@ class TotalMessages(Transform):
         like_one.rename(columns={like_one.columns[0]: 'a'}, inplace=True)
         like_all.rename(columns={like_all.columns[0]: 'a'}, inplace=True)
 
-        return([like_all,like_all.sub(like_one), like_one])
+        return([like_all, like_all.sub(like_one), like_one])
+
 
 class TransformSolver:
-
+    """The Context Manager"""
     def __init__(self, strategy):
         self.strategy = strategy
 

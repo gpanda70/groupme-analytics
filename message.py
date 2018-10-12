@@ -32,7 +32,10 @@ class Message:
         return self.df
 
     def update(self):
-        """Updates the messages in the csv file from the last message that was retrieved"""
+        """
+        Updates the messages in the csv file, starting from the last message
+        that was retrieved
+        """
 
         last_msg_id = self.df['message_id'].iat[0]
         payload = {'after_id': last_msg_id}
@@ -44,7 +47,7 @@ class Message:
         while history:
             try:
 
-                for i in range(0,20):
+                for i in range(0, 20):
                     self.user.append(data['response']['messages'][i]['name'])
                     self.created_at.append(data['response']['messages'][i]['created_at'])
                     self.text.append(data['response']['messages'][i]['text'])
@@ -66,6 +69,8 @@ class Message:
                 self.is_current = True
 
     def save(self):
+        """Concats new data to previous csv and updates it"""
+
         if not self.is_current:
             user_map = {'10509565': 'Paul Joon Kim', '10956238': 'Cody Walls', '12719684': 'Christian Cremo',
                         '13130965': 'Stephen Osborn', '16923137': 'Scott Tippins', '303329': 'Jenkins',
